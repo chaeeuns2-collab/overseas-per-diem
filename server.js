@@ -26,8 +26,8 @@ http.createServer(async (req, res) => {
     fs.createReadStream(path.join(__dirname, "rates.json")).pipe(res);
     return;
   }
-  if (url.pathname.startsWith("/files/")) {
-    const file = path.join(__dirname, "files", path.basename(url.pathname));
+  if (url.pathname.startsWith("/files/") || url.pathname.startsWith("/fonts/")) {
+    const file = path.join(__dirname, url.pathname.split("/")[1], path.basename(url.pathname));
     if (fs.existsSync(file)) {
       res.writeHead(200, { "Content-Type": "application/octet-stream" });
       fs.createReadStream(file).pipe(res);
