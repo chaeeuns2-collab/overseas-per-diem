@@ -40,35 +40,36 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"ss06" 1}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;letter-spacing:-.01em;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased;font-feature-settings:"tnum" 1,"ss06" 1}
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--moss);outline-offset:2px}
 
 /* ---------- header ---------- */
-.top{border-bottom:1px solid var(--line);padding-inline:24px}
-.top-bar{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:14px;font-size:13px;color:var(--ink-2)}
+.top{padding-inline:24px}
+.top-bar{max-width:1440px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 24px;padding-block:12px;font-size:13px;color:var(--ink-2);border-top:1px solid var(--line)}
+.src{display:flex;flex-wrap:wrap;gap:6px 18px}
 .mark{display:flex;align-items:center;gap:10px;font-weight:500;color:var(--ink)}
 .mark i{width:22px;height:22px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-style:normal;color:var(--lime-ink);font-size:13px;font-weight:700}
 .top-bar a{color:var(--ink-2);text-decoration:none;border-bottom:1px solid var(--line-2)}
 .top-bar a:hover{color:var(--ink)}
-.title-wrap{text-align:center;padding-block:clamp(26px,4.5vw,52px) clamp(22px,3.5vw,40px)}
+.title-wrap{text-align:center;padding-block:clamp(20px,2.6vw,32px) clamp(16px,2vw,24px)}
 .eyebrow{font-size:12px;letter-spacing:.18em;color:var(--ink-3);margin:0 0 14px;display:inline-flex;align-items:center;gap:8px}
 .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime)}
-h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,5vw,64px);letter-spacing:-.045em;line-height:1.12;margin:0;text-wrap:balance}
-.sub{margin:14px auto 0;max-width:56ch;color:var(--ink-2);font-size:clamp(14px,1.3vw,16px);text-wrap:balance}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(26px,3.6vw,46px);letter-spacing:-.04em;line-height:1.12;margin:0;text-wrap:balance}
+.sub{margin:10px auto 0;max-width:56ch;color:var(--ink-2);font-size:clamp(14px,1.3vw,16px);text-wrap:balance}
 
 /* ---------- split ---------- */
-.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);border-top:1px solid var(--line);min-height:760px}
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);border-top:1px solid var(--line);min-height:max(640px,calc(100vh - 170px))}
 .left{padding:clamp(24px,3.4vw,52px) clamp(16px,3.4vw,52px);display:flex;flex-direction:column;gap:28px;max-width:640px;width:100%;justify-self:end}
-.right{position:relative;overflow:hidden;background:#C9D6B8}
-.right canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-.right::after{content:"";position:absolute;inset:0;background:var(--veil);pointer-events:none}
-.stage{position:relative;z-index:1;padding:clamp(40px,6vw,96px) clamp(16px,4vw,64px);display:flex;flex-direction:column;align-items:center}
+.right{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(160deg,#E4EBDB 0%,#C6D5B3 38%,#8FAE80 72%,#5E7F57 100%)}
+.right canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:-1}
+.right::after{content:"";position:absolute;inset:0;z-index:-1;background:var(--veil);pointer-events:none}
+.stage{position:relative;z-index:1;padding:clamp(36px,5vw,80px) clamp(16px,4vw,64px);display:flex;flex-direction:column;align-items:center}
 
 /* ---------- form ---------- */
 .group{display:flex;flex-direction:column;gap:14px}
 .group+.group{padding-top:28px;border-top:1px solid var(--line)}
-.label{display:flex;align-items:center;gap:12px;margin:0;font-size:clamp(19px,1.7vw,22px);font-weight:700;letter-spacing:-.025em;color:var(--ink);line-height:1.2}
+.label{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0;font-size:clamp(19px,1.7vw,22px);font-weight:700;letter-spacing:-.025em;color:var(--ink);line-height:1.2}
 .label b{flex:none;display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--lime);color:var(--lime-ink);font-size:13px;font-weight:700;letter-spacing:0}
 .label small{font-size:12px;font-weight:500;letter-spacing:.14em;color:var(--ink-3);margin-left:auto}
 .applied{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:16px;background:var(--paper-2);border:1px solid var(--line);font-size:13px;color:var(--ink-2)}
@@ -120,6 +121,14 @@ h1{font-family:var(--serif);font-weight:700;font-size:clamp(30px,5vw,64px);lette
 .leg-meta .warn{color:var(--warn)}
 .add{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border:1px dashed var(--line-2);background:none;border-radius:999px;height:40px;padding:0 18px;cursor:pointer;font-size:13.5px;color:var(--ink-2)}
 .add:hover{border-style:solid;color:var(--ink);background:var(--field)}
+.lodge{position:relative;display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:18px;border:1px solid var(--line);background:var(--paper)}
+.lodge-t{font-size:12.5px;color:var(--ink-2);font-weight:600}
+.tip-wrap{display:inline-flex}
+.info{display:inline-grid;place-items:center;width:16px;height:16px;margin-left:7px;border-radius:50%;border:1px solid currentColor;font-style:normal;font-size:10px;font-weight:700;font-family:Georgia,serif;opacity:.75}
+.tip{position:absolute;left:12px;right:12px;bottom:calc(100% + 10px);transform:translateY(4px);max-width:420px;padding:12px 14px;border-radius:14px;background:var(--ink);color:var(--paper);font-size:12.5px;line-height:1.6;font-weight:400;box-shadow:var(--shadow);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .15s,transform .15s,visibility .15s;z-index:30;text-align:left}
+.tip::after{content:"";position:absolute;left:150px;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:var(--ink)}
+.tip-wrap:hover .tip,.tip-wrap:focus-within .tip,.tip-wrap.show .tip{opacity:1;visibility:visible;transform:none}
+
 .trip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
 .trip b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
 .rate-row{display:flex;gap:10px;align-items:center}
@@ -191,23 +200,20 @@ tr.tot td.won{font-size:16px}
   .tiles{grid-template-columns:1fr}
   .total{text-align:left}
   .float{margin-left:0}
-  .top-bar .src{display:none}
+  .top-bar{flex-wrap:wrap;gap:6px 16px;font-size:12px}
 }
 @media (prefers-reduced-motion:no-preference){
-  .right canvas{animation:fade .9s ease both}
-  @keyframes fade{from{opacity:.35}to{opacity:1}}
 }
 </style>
 
 <header class="top">
-  <div class="top-bar">
-    <div class="mark"><i>✱</i>국외 여비 계산기</div>
-    <div class="src">공무원 여비 규정 [별표 4] 국외 여비 지급표 기준 · <a href="https://www.kebhana.com/cms/rate/index.do?contentUrl=/cms/rate/wpfxd651_01i.do" target="_blank" rel="noopener">하나은행 환율조회</a></div>
-  </div>
   <div class="title-wrap">
-    <p class="eyebrow">OVERSEAS PER DIEM</p>
     <h1>교육공무원 국외여행 체재비</h1>
     <p class="sub">출장 일정과 방문 도시를 입력하면 체재비를 계산해 드립니다.</p>
+  </div>
+  <div class="top-bar">
+    <div class="mark"><i>✱</i>국외 여비 계산기</div>
+    <div class="src"><a href="files/byeolpyo4-overseas-per-diem.hwp" download="[별표 4] 국외 여비 지급표(제16조제1항 관련)(공무원 여비 규정).hwp" title="별표 4 원문(HWP) 내려받기">공무원 여비 규정 [별표 4] 국외 여비 지급표 다운로드 ↓</a><a href="https://www.kebhana.com/cms/rate/index.do?contentUrl=/cms/rate/wpfxd651_01i.do" target="_blank" rel="noopener">하나은행 환율조회 ↗</a></div>
   </div>
 </header>
 
@@ -219,8 +225,9 @@ tr.tot td.won{font-size:16px}
         <label class="field"><span>조회 날짜 (환율 기준일)</span><input class="input" type="date" id="qdate"></label>
         <label class="field"><span>직위</span>
           <select class="select" id="position">
+            <option value="" selected disabled>직위를 선택하세요</option>
             <option value="dean">학장</option>
-            <option value="prof" selected>교수</option>
+            <option value="prof">교수</option>
             <option value="assoc">부교수</option>
             <option value="assist">조교수</option>
             <option value="etc">기타</option>
@@ -237,7 +244,7 @@ tr.tot td.won{font-size:16px}
           <option value="4" selected>제2호</option>
         </select>
       </label>
-      <div class="applied"><span class="chip" id="tierChip">제1호 라목</span><span id="tierWhy"></span></div>
+      <div class="applied"><span class="chip" id="tierChip">선택 전</span><span id="tierWhy"></span></div>
     </div>
 
     <div class="group">
@@ -246,6 +253,16 @@ tr.tot td.won{font-size:16px}
       <div class="legs" id="legs"></div>
       <button class="add" type="button" id="addLeg">＋ 방문 도시 추가</button>
       <div class="trip" id="trip"></div>
+      <div class="lodge">
+        <span class="lodge-t">숙박비 계산 방식</span>
+        <div class="seg" role="group" aria-label="숙박비 계산 방식" id="lodgeMode">
+          <button type="button" data-lm="cap" aria-pressed="true">실비 상한액</button>
+          <span class="tip-wrap">
+            <button type="button" data-lm="disc" aria-pressed="false" aria-describedby="discTip">할인정액 (85%)<i class="info" aria-hidden="true">i</i></button>
+            <span class="tip" role="tooltip" id="discTip">국외 숙박비 할인정액은 영수증 증빙을 제출하는 실비 정산 절차를 생략하는 대신, 규정상 숙박비 상한액의 85% 금액을 정액으로 미리 지급 받는 방식입니다.</span>
+          </span>
+        </div>
+      </div>
     </div>
 
     <div class="group">
@@ -258,7 +275,7 @@ tr.tot td.won{font-size:16px}
       <p class="note" id="rateWarn" hidden></p>
     </div>
 
-    <div class="checks"><span>원 미만 절사</span><span>숙박비는 실비 상한액</span><span>자동 계산</span></div>
+    <div class="checks"><span>원 미만 절사</span><span>숙박비 상한액·할인정액 선택</span><span>자동 계산</span></div>
   </section>
 
   <section class="right" aria-label="계산 결과">
@@ -277,9 +294,10 @@ tr.tot td.won{font-size:16px}
         <div class="tiles">
           <div class="tile"><div class="t">일비</div><div class="n" id="s1">0원</div></div>
           <div class="tile"><div class="t">식비</div><div class="n" id="s2">0원</div></div>
-          <div class="tile"><div class="t">숙박비 (상한)</div><div class="n" id="s3">0원</div></div>
+          <div class="tile"><div class="t" id="s3t">숙박비 (상한)</div><div class="n" id="s3">0원</div></div>
         </div>
-        <div class="table-wrap">
+        <p class="empty-state" id="emptyMsg" hidden></p>
+        <div class="table-wrap" id="tableWrap">
           <table>
             <thead><tr><th>구분</th><th>계산 근거 (달러 × 원화)</th><th class="r">원화</th></tr></thead>
             <tbody id="tbody"></tbody>
@@ -289,7 +307,6 @@ tr.tot td.won{font-size:16px}
           <div><strong id="footLabel">하나은행 최종 매매 기준율(—)</strong></div>
           <div class="mono" id="footRate">—</div>
         </div>
-        <p class="fine">일비·식비는 체재 일수, 숙박비는 선택한 숙박 일수(박)로 계산합니다. 지급 구분은 공무원 여비 규정 별표 1(시행 2026. 7. 1.)을 따릅니다. 여러 도시를 방문하면 도시를 옮기는 날은 다음 도시의 등급을 적용합니다. 숙박비는 실비 상한액이며 실제 지급은 영수증 실비 범위 안에서 이뤄집니다. 공적 항공마일리지 사용에 따른 일비 추가 지급(비고 1의2)과 숙박비 할인정액(비고 4)은 반영하지 않았습니다.</p>
       </div>
     </div>
   </section>
@@ -387,18 +404,17 @@ function searchPlaces(q){
 }
 
 /* ---------- state ---------- */
+function todayLocal(){ const d = new Date(Date.now() - new Date().getTimezoneOffset()*60000); return d.toISOString().slice(0,10); }
 const state = {
-  date: "2026-09-30", position: "prof", tier: 3, manualTier: 4, rateManual: null, live: null,
-  legs: [
-    {place: PLACES.find(p=>p.name==="도쿄"), start:"2026-10-12", end:"2026-10-15", cut:0},
-    {place: PLACES.find(p=>p.name==="오사카"), start:"2026-10-15", end:"2026-10-17", cut:0},
-  ],
+  date: todayLocal(), position: "", tier: null, manualTier: 4, rateManual: null, live: null, lodgeMode: "cap",
+  legs: [ {place: null, start: "", end: "", cut: 0} ],
 };
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
 const won = n => Math.floor(n).toLocaleString("ko-KR");
-const usd = n => "US$" + n.toLocaleString("en-US");
+const usd = n => "US$" + n.toLocaleString("en-US",{maximumFractionDigits:2});
+const cents = n => Math.round(n*100)/100;
 const rateFmt = r => r.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 const d2 = s => s ? new Date(s+"T00:00:00") : null;
 const dayDiff = (a,b) => Math.round((d2(b)-d2(a))/86400000);
@@ -483,12 +499,12 @@ function bindCombo(box, i){
 
 /* ---------- compute ---------- */
 function compute(){
-  const pos = POSITIONS[state.position];
-  state.tier = pos.tier ?? state.manualTier;
-  $("tierWrap").hidden = pos.tier !== null;
-  $("tierChip").textContent = TIERS[state.tier].name;
-  $("tierWhy").textContent = pos.tier !== null ? pos.why + " → " + TIERS[state.tier].name + " 적용" : pos.why;
-  const T = TIERS[state.tier];
+  const pos = POSITIONS[state.position] || null;
+  state.tier = pos ? (pos.tier ?? state.manualTier) : null;
+  $("tierWrap").hidden = !pos || pos.tier !== null;
+  $("tierChip").textContent = pos ? TIERS[state.tier].name : "선택 전";
+  $("tierWhy").textContent = !pos ? "직위를 선택하면 별표 1에 따라 여비 지급 구분이 자동으로 정해집니다." : pos.tier !== null ? pos.why + " → " + TIERS[state.tier].name + " 적용" : pos.why;
+  const T = pos ? TIERS[state.tier] : null;
   const liveHit = state.live && state.live.date === state.date ? state.live : null;
   const look = liveHit ? {rate:liveHit.rate, key:ymd(liveHit.noticeDate), exact: liveHit.noticeDate===state.date, after:false, live:liveHit} : lookupRate(state.date);
   const auto = look && look.rate ? look.rate : null;
@@ -520,7 +536,7 @@ function compute(){
   // legs
   const legs = state.legs;
   const valid = legs.map(l=>l.place && l.start && l.end && dayDiff(l.start,l.end)>=0);
-  const lastValid = valid.lastIndexOf(true);
+  let prevEnd = null;
   const rows = []; const sums=[0,0,0]; let totUsd=0, totNights=0, totDays=0;
   legs.forEach((l,i)=>{
     const meta = $(`meta-${i}`), nbox = $(`nights-${i}`);
@@ -529,8 +545,10 @@ function compute(){
     if(!l.start||!l.end){ meta.innerHTML = `<span>도착일과 출발일을 입력하세요.</span>`; return; }
     const span = dayDiff(l.start,l.end);
     if(span<0){ meta.innerHTML = `<span class="warn">출발일이 도착일보다 빠릅니다.</span>`; return; }
-    const days = i===lastValid ? span+1 : span;
-    const maxCut = Math.min(3, span);
+    const shared = prevEnd === l.start;
+    const days = shared ? span : span+1;
+    prevEnd = l.end;
+    const maxCut = Math.min(2, span);
     l.cut = Math.min(l.cut||0, maxCut);
     const nights = span - l.cut;
     const g = G.indexOf(l.place.grade);
@@ -540,28 +558,35 @@ function compute(){
       for (let c=0;c<=maxCut;c++) btns += `<button type="button" data-cut="${c}" aria-pressed="${c===l.cut}">${span-c}박 ${days}일${c===0?"<small>기본</small>":`<small>−${c}박</small>`}</button>`;
       nbox.innerHTML = `<p class="nights-q"><b>숙박 일수를 선택하세요.</b> 기내 숙박 등으로 실제 숙박 수가 적으면 해당 박 수를 고르세요. 일비·식비 일수(${days}일)는 그대로입니다.</p><div class="seg" role="group" aria-label="숙박 일수">${btns}</div>`;
     }
-    meta.innerHTML = `<span class="chip g-${l.place.grade}">${l.place.grade}등급</span><span>${nights}박 ${days}일 적용</span>${i!==lastValid?`<span>· 출발일은 다음 방문지로 계산</span>`:""}`;
+    meta.innerHTML = `<span class="chip g-${l.place.grade}">${l.place.grade}등급</span><span>${nights}박 ${days}일 적용</span>${shared?`<span>· 이동일(${short(l.start)})은 앞 도시에 포함</span>`:""}`;
     totNights += nights; totDays += days;
+    if (!T) return;
+    const disc = state.lodgeMode === "disc";
     const items = [
       ["일비", "", T.daily, days, "일"],
       ["식비", "", T.meal[g], days, "일"],
-      ["숙박비", "실비 상한액", T.lodge[g], nights, "박"],
+      ["숙박비", disc ? "할인정액 (상한액×85%)" : "실비 상한액", disc ? cents(T.lodge[g]*0.85) : T.lodge[g], nights, "박", disc ? T.lodge[g] : null],
     ];
     rows.push(`<tr class="leg-row"><td colspan="3"><strong>${esc(l.place.name)}</strong>${l.place.kind==="city"&&l.place.country!==l.place.name?esc(l.place.country)+" · ":""}${l.place.grade}등급 · ${short(l.start)}–${short(l.end)} · ${nights}박 ${days}일</td></tr>`);
-    items.forEach(([name,sub,unit,cnt,u],k)=>{
-      const sUsd = unit*cnt; const krw = rate ? Math.floor(sUsd*rate) : 0;
+    items.forEach(([name,sub,unit,cnt,u,cap],k)=>{
+      const sUsd = cents(unit*cnt); const krw = rate ? Math.floor(sUsd*rate) : 0;
       sums[k]+=krw; totUsd+=sUsd;
-      rows.push(`<tr><td class="item">${name}${sub?`<small>${sub}</small>`:""}</td><td class="calc">${usd(unit)} × ${cnt}${u} = <em>${usd(sUsd)}</em><br>${usd(sUsd)} × ${rate?rateFmt(rate):"—"}원 = <em>${rate?won(sUsd*rate):"—"}원</em></td><td class="r won">${rate?won(krw)+"원":"—"}</td></tr>`);
+      rows.push(`<tr><td class="item">${name}${sub?`<small>${sub}</small>`:""}</td><td class="calc">${cap?`${usd(cap)} × 85% = ${usd(unit)}<br>`:""}${usd(unit)} × ${cnt}${u} = <em>${usd(sUsd)}</em><br>${usd(sUsd)} × ${rate?rateFmt(rate):"—"}원 = <em>${rate?won(sUsd*rate):"—"}원</em></td><td class="r won">${rate?won(krw)+"원":"—"}</td></tr>`);
     });
   });
   const total = sums[0]+sums[1]+sums[2];
   if (rows.length) rows.push(`<tr class="tot"><td>합계</td><td class="calc">${usd(totUsd)} · 총 ${totNights}박 ${totDays}일</td><td class="r won">${won(total)}원</td></tr>`);
-  $("tbody").innerHTML = rows.length ? rows.join("") : `<tr><td colspan="3" class="empty-state">방문 도시와 일정을 입력하면 여기에 계산 결과가 표시됩니다.</td></tr>`;
+  const need = [!T&&"직위", !legs.some(l=>l.place)&&"방문지", !legs.some(l=>l.start&&l.end)&&"도착일·출발일"].filter(Boolean);
+  $("tbody").innerHTML = rows.join("");
+  $("tableWrap").hidden = !rows.length; $("emptyMsg").hidden = !!rows.length;
+  $("emptyMsg").textContent = `${need.length?need.join(", ")+"을(를) 선택하면":"일정을 입력하면"} 여기에 일비·식비·숙박비가 계산됩니다.`;
   $("tKrw").innerHTML = `${won(total)}<small>원</small>`;
   $("tUsd").textContent = `${usd(totUsd)} × ${rate?rateFmt(rate):"—"}`;
+  $("s3t").textContent = state.lodgeMode==="disc" ? "숙박비 (할인정액)" : "숙박비 (상한)";
+  document.querySelectorAll("#lodgeMode [data-lm]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.lm===state.lodgeMode));
   $("s1").textContent = won(sums[0])+"원"; $("s2").textContent = won(sums[1])+"원"; $("s3").textContent = won(sums[2])+"원";
   const starts = legs.filter((l,i)=>valid[i]).map(l=>l.start).sort(), ends = legs.filter((l,i)=>valid[i]).map(l=>l.end).sort();
-  $("sumMeta").textContent = `${T.name} · ` + (starts.length ? `${starts[0]} ~ ${ends[ends.length-1]} · ${totNights}박 ${totDays}일` : "일정 미입력");
+  $("sumMeta").textContent = `${T?T.name:"직위 선택 전"} · ` + (starts.length ? `${starts[0]} ~ ${ends[ends.length-1]} · ${totNights}박 ${totDays}일` : "일정 미입력");
   $("trip").innerHTML = starts.length ? `전체 일정 <b>${starts[0]} ~ ${ends[ends.length-1]}</b> · <b>${totNights}박 ${totDays}일</b>` : "";
   document.querySelectorAll("#refBody tr").forEach((tr,i)=>tr.classList.toggle("on", i===state.tier));
 }
@@ -600,6 +625,8 @@ $("rate").addEventListener("input", e=>{
 });
 $("rate").addEventListener("blur", compute);
 $("rateReset").addEventListener("click", ()=>{ state.rateManual=null; compute(); });
+$("lodgeMode").addEventListener("click", e=>{ const b=e.target.closest("[data-lm]"); if(!b) return; state.lodgeMode=b.dataset.lm; compute();
+  const w=b.closest(".tip-wrap"); if(w){ w.classList.add("show"); clearTimeout(w._t); w._t=setTimeout(()=>w.classList.remove("show"),4000); } });
 // GitHub Actions가 매일 갱신하는 rates.json을 읽어 내장 자료에 합칩니다.
 async function loadRatesFile(){
   if (location.protocol === "file:") return;
@@ -635,7 +662,6 @@ renderLegs(); compute(); loadRatesFile(); fetchLive();
     cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);
     const r = rng(20261001), n1 = noise1(r), n2 = noise1(r), n3 = noise1(r), n4 = noise1(r);
-    // ridge profiles (y as fraction of H)
     const far = x => { const u=x/W; const peak=Math.exp(-Math.pow((u-0.62)/0.17,2)); return H*(0.50 - 0.30*peak - 0.10*n1(u) + 0.03*Math.sin(u*40)*peak); };
     const mid = x => { const u=x/W; return H*(0.60 - 0.08*n2(u) - 0.05*Math.exp(-Math.pow((u-0.2)/0.2,2))); };
     const forest = x => { const u=x/W; return H*(0.72 - 0.05*n3(u)); };
@@ -643,7 +669,7 @@ renderLegs(); compute(); loadRatesFile(); fetchLive();
     const trees = [];
     for (let i=0;i<Math.round(W/16);i++){ const x=r()*W; const base=forest(x)+r()*H*0.10; const h=H*(0.06+r()*0.10); trees.push({x,base,h,w:h*(0.26+r()*0.1)}); }
     for (let i=0;i<Math.round(W/60);i++){ const x=r()*W; const base=meadow(x)+H*0.02+r()*H*0.12; const h=H*(0.09+r()*0.12); trees.push({x,base,h,w:h*0.28}); }
-    trees.sort((a,b)=>b.base-a.base); // nearest first for hit testing
+    trees.sort((a,b)=>b.base-a.base);
     function inTree(x,y){ for(const t of trees){ if(y>t.base||y<t.base-t.h) continue; const k=(y-(t.base-t.h))/t.h; if(Math.abs(x-t.x) < t.w*k*(0.85+0.15*Math.sin(k*30))) return true; } return false; }
     function color(x,y){
       if (inTree(x,y)) return PAL.tree;

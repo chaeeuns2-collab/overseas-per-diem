@@ -26,6 +26,14 @@ http.createServer(async (req, res) => {
     fs.createReadStream(path.join(__dirname, "rates.json")).pipe(res);
     return;
   }
+  if (url.pathname.startsWith("/files/")) {
+    const file = path.join(__dirname, "files", path.basename(url.pathname));
+    if (fs.existsSync(file)) {
+      res.writeHead(200, { "Content-Type": "application/octet-stream" });
+      fs.createReadStream(file).pipe(res);
+      return;
+    }
+  }
   if (url.pathname === "/" || url.pathname === "/index.html") {
     res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
     fs.createReadStream(page).pipe(res);
