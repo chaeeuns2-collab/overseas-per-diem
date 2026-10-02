@@ -202,7 +202,11 @@ tr.tot td.won{font-size:16px}
 }
 .cnt-btn{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;margin:0 1px;border:1px dashed var(--line-2);border-radius:999px;background:var(--paper);color:var(--ink);font:inherit;cursor:pointer;line-height:1.5}
 .cnt-btn:hover{border-style:solid;border-color:var(--moss);color:var(--moss)}
-.cnt-btn .pen{width:12px;height:12px;opacity:.7}
+.cnt-btn{position:relative}
+.cnt-btn::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translate(-50%,3px);padding:5px 10px;border-radius:8px;background:var(--ink);color:var(--paper);font-size:11.5px;font-weight:500;white-space:nowrap;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .12s,transform .12s,visibility .12s;z-index:5}
+.cnt-btn::before{content:"";position:absolute;left:50%;bottom:calc(100% + 2px);margin-left:-5px;border:5px solid transparent;border-top-color:var(--ink);opacity:0;visibility:hidden;transition:opacity .12s,visibility .12s;z-index:5}
+.cnt-btn:hover::after,.cnt-btn:focus-visible::after{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.cnt-btn:hover::before,.cnt-btn:focus-visible::before{opacity:1;visibility:visible}
 .cnt-in{width:64px;height:28px;padding:0 8px;margin:0 2px;border:1.5px solid var(--moss);border-radius:8px;background:var(--paper);font:inherit;font-size:14px;color:var(--ink)}
 .adj{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px;font-size:11.5px;color:var(--warn)}
 .cnt-reset{border:0;background:none;padding:0;font:inherit;color:var(--ink-3);text-decoration:underline;cursor:pointer}
@@ -220,6 +224,7 @@ tr.tot td.won{font-size:16px}
   .tile{padding:10px}
   .tile .n{font-size:14px}
   #tableWrap{overflow:visible}
+  #result{scroll-margin-top:72px}
   #tableWrap table{min-width:0}
   #tableWrap thead{display:none}
   #tableWrap tr{display:grid;grid-template-columns:1fr auto;column-gap:10px;border-bottom:1px solid var(--line);padding:10px 2px}
@@ -261,7 +266,7 @@ body{margin:0}
   </div>
   <div class="top-bar">
     <div class="mark"><i>✱</i>국외 여비 계산기</div>
-    <div class="src"><a href="files/byeolpyo4-overseas-per-diem.hwp" download="[별표 4] 국외 여비 지급표(제16조제1항 관련)(공무원 여비 규정).hwp" title="별표 4 원문(HWP) 내려받기">공무원 여비 규정 [별표 4] 국외 여비 지급표 다운로드 ↓</a><a href="https://www.kebhana.com/cms/rate/index.do?contentUrl=/cms/rate/wpfxd651_01i.do" target="_blank" rel="noopener">하나은행 환율조회 ↗</a></div>
+    <div class="src"><a href="files/byeolpyo4-overseas-per-diem.hwp" download="[별표 4] 국외 여비 지급표(제16조제1항 관련)(공무원 여비 규정).hwp" title="별표 4 원문(HWP) 내려받기">공무원 여비 규정 [별표 4] 국외 여비 지급표 ↓</a><a href="https://www.kebhana.com/cms/rate/index.do?contentUrl=/cms/rate/wpfxd651_01i.do" target="_blank" rel="noopener">하나은행 환율조회 ↗</a></div>
   </div>
 </header>
 
@@ -344,7 +349,7 @@ body{margin:0}
           <div class="tile"><div class="t">식비</div><div class="n" id="s2">0원</div></div>
           <div class="tile"><div class="t" id="s3t">숙박비 (상한)</div><div class="n" id="s3">0원</div></div>
         </div>
-        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수 옆 연필(✎)을 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.</p>
+        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수(예: 15일)를 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.</p>
         <p class="empty-state" id="emptyMsg" hidden></p>
         <div class="table-wrap" id="tableWrap">
           <table>
@@ -548,7 +553,6 @@ function bindCombo(box, i){
   input.addEventListener("blur", ()=>{ setTimeout(()=>{ close(); if(document.activeElement!==input) input.value = state.legs[i].place?.name||""; },120) });
 }
 
-const PENCIL = '<svg class="pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
 
 /* ---------- compute ---------- */
 function compute(){
@@ -630,7 +634,7 @@ function compute(){
       sums[k]+=krw; totUsd+=sUsd;
       const cntHtml = state.editing === key
         ? `<input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="${k}" aria-label="${name} ${u} 수">${u}`
-        : `<button type="button" class="cnt-btn" data-i="${i}" data-k="${k}" title="${name} ${u === "박" ? "박" : "일"} 수 수정">${cnt}${u}${PENCIL}</button>`;
+        : `<button type="button" class="cnt-btn" data-i="${i}" data-k="${k}" data-tip="${u === "박" ? "박수 수정" : "일수 수정"}" aria-label="${name} ${cnt}${u}, ${u === "박" ? "박수 수정" : "일수 수정"}">${cnt}${u}</button>`;
       const adj = l.ovr[k] != null ? `<span class="adj">기본 ${base}${u} → ${cnt}${u} 조정 <button type="button" class="cnt-reset" data-i="${i}" data-k="${k}">되돌리기</button></span>` : "";
       rows.push(`<tr><td class="item">${name}${sub?`<small>${sub}</small>`:""}</td><td class="calc">${cap?`${usd(cap)} × 85% = ${usd(unit)}<br>`:""}${usd(unit)} × ${cntHtml} = <em>${usd(sUsd)}</em><br>${usd(sUsd)} × ${rate?rateFmt(rate):"—"}원 = <em>${rate?won(sUsd*rate):"—"}원</em>${adj}</td><td class="r won">${rate?won(krw)+"원":"—"}</td></tr>`);
     });
@@ -648,6 +652,12 @@ function compute(){
   $("s3t").textContent = state.lodgeMode==="disc" ? "숙박비 (할인정액)" : "숙박비 (상한)";
   document.querySelectorAll("#lodgeMode [data-lm]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.lm===state.lodgeMode));
   $("s1").textContent = won(sums[0])+"원"; $("s2").textContent = won(sums[1])+"원"; $("s3").textContent = won(sums[2])+"원";
+  const complete = !!T && legs.length > 0 && legs.every((l,i)=>valid[i]);
+  if (complete && !state.wasComplete && state.touched && matchMedia("(max-width:760px)").matches){
+    clearTimeout(state.scrollT);
+    state.scrollT = setTimeout(()=>{ if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); $("result").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"}); }, 450);
+  }
+  state.wasComplete = complete;
   const starts = legs.filter((l,i)=>valid[i]).map(l=>l.start).sort(), ends = legs.filter((l,i)=>valid[i]).map(l=>l.end).sort();
   $("sumMeta").textContent = `${T?T.name:"직위 선택 전"} · ` + (starts.length ? `${starts[0]} ~ ${ends[ends.length-1]} · ${totNights}박 ${totDays}일` : "일정 미입력");
   $("trip").innerHTML = starts.length ? `전체 일정 <b>${starts[0]} ~ ${ends[ends.length-1]}</b> · <b>${totNights}박 ${totDays}일</b>` : "";
@@ -726,6 +736,7 @@ async function loadRatesFile(){
   }catch(e){}
 }
 renderLegs(); compute(); loadRatesFile(); fetchLive();
+["input","change","click"].forEach(ev=>$("legs").parentElement.closest(".left").addEventListener(ev, ()=>{ state.touched = true; }, true));
 
 /* ---------- pointillist sky: pastel gradient, stippled clouds, paper plane ---------- */
 (function(){
