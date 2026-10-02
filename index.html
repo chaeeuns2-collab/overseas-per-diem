@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="공무원 여비 규정 별표 1·4와 하나은행 최종 매매기준율로 교육공무원 국외출장 일비·식비·숙박비를 원화로 계산합니다.">
 <title>교육공무원 국외여행 체재비</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -194,17 +200,59 @@ tr.tot td.won{font-size:16px}
   .right{min-height:560px}
   .tiles{grid-template-columns:1fr 1fr 1fr}
 }
+.cnt-btn{display:inline-flex;align-items:center;gap:4px;padding:1px 8px;margin:0 1px;border:1px dashed var(--line-2);border-radius:999px;background:var(--paper);color:var(--ink);font:inherit;cursor:pointer;line-height:1.5}
+.cnt-btn:hover{border-style:solid;border-color:var(--moss);color:var(--moss)}
+.cnt-btn .pen{width:12px;height:12px;opacity:.7}
+.cnt-in{width:64px;height:28px;padding:0 8px;margin:0 2px;border:1.5px solid var(--moss);border-radius:8px;background:var(--paper);font:inherit;font-size:14px;color:var(--ink)}
+.adj{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px;font-size:11.5px;color:var(--warn)}
+.cnt-reset{border:0;background:none;padding:0;font:inherit;color:var(--ink-3);text-decoration:underline;cursor:pointer}
+.edit-hint{margin:14px 0 0;font-size:12.5px;color:var(--ink-3)}
+.mbar{display:none}
+@media (max-width:760px){
+  .input,.select{font-size:16px}
+  .title-wrap{padding-block:18px 14px}
+  .split{border-top:0}
+  .left{padding-block:20px 28px;gap:22px}
+  .right{min-height:0}
+  .stage{padding:44px 14px 36px}
+  .card{border-radius:22px;padding:34px 16px 18px}
+  .tiles{grid-template-columns:repeat(3,1fr);gap:8px}
+  .tile{padding:10px}
+  .tile .n{font-size:14px}
+  #tableWrap{overflow:visible}
+  #tableWrap table{min-width:0}
+  #tableWrap thead{display:none}
+  #tableWrap tr{display:grid;grid-template-columns:1fr auto;column-gap:10px;border-bottom:1px solid var(--line);padding:10px 2px}
+  #tableWrap td{border:0;padding:0}
+  #tableWrap td.item{grid-row:1;grid-column:1}
+  #tableWrap td.won{grid-row:1;grid-column:2}
+  #tableWrap td.calc{grid-row:2;grid-column:1/-1;margin-top:4px}
+  #tableWrap tr.leg-row{display:block;padding:9px 10px;border-radius:10px;border:0;margin-top:8px;background:var(--paper-2)}
+  #tableWrap tr.leg-row td{background:none;padding:0}
+  #tableWrap tr.tot{border-bottom:0}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);transition:transform .2s}
+  .mbar.off{transform:translateY(110%)}
+  .mbar small{display:block;font-size:11px;color:var(--ink-3)}
+  .mbar b{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+  .mbtn{flex:none;height:40px;padding:0 16px;display:inline-flex;align-items:center;border-radius:999px;background:var(--ink);color:var(--paper);text-decoration:none;font-size:13.5px;font-weight:600}
+  .ref{padding-bottom:96px}
+}
 @media (max-width:520px){
   .top{padding-inline:16px}
   .row2{grid-template-columns:1fr}
-  .tiles{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr;gap:6px}
+  .tile{display:flex;justify-content:space-between;align-items:baseline;padding:9px 14px}
   .total{text-align:left}
   .float{margin-left:0}
   .top-bar{flex-wrap:wrap;gap:6px 16px;font-size:12px}
 }
 @media (prefers-reduced-motion:no-preference){
 }
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
 </style>
+</head>
+<body>
 
 <header class="top">
   <div class="title-wrap">
@@ -286,7 +334,7 @@ tr.tot td.won{font-size:16px}
         <div class="v" id="fRate">—</div>
         <div class="s" id="fDate">—</div>
       </div>
-      <div class="card">
+      <div class="card" id="result">
         <div class="sum">
           <div><h2>체재비 계산 결과</h2><p id="sumMeta">—</p></div>
           <div class="total"><div class="big" id="tKrw">0<small>원</small></div><div class="usd" id="tUsd">US$0</div></div>
@@ -296,6 +344,7 @@ tr.tot td.won{font-size:16px}
           <div class="tile"><div class="t">식비</div><div class="n" id="s2">0원</div></div>
           <div class="tile"><div class="t" id="s3t">숙박비 (상한)</div><div class="n" id="s3">0원</div></div>
         </div>
+        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수 옆 연필(✎)을 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.</p>
         <p class="empty-state" id="emptyMsg" hidden></p>
         <div class="table-wrap" id="tableWrap">
           <table>
@@ -311,6 +360,8 @@ tr.tot td.won{font-size:16px}
     </div>
   </section>
 </main>
+
+<div class="mbar" id="mbar"><div><small>체재비 합계</small><b id="mTotal">0원</b></div><a class="mbtn" href="#result">결과 보기 ↓</a></div>
 
 <section class="ref">
   <div class="ref-in">
@@ -497,6 +548,8 @@ function bindCombo(box, i){
   input.addEventListener("blur", ()=>{ setTimeout(()=>{ close(); if(document.activeElement!==input) input.value = state.legs[i].place?.name||""; },120) });
 }
 
+const PENCIL = '<svg class="pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+
 /* ---------- compute ---------- */
 function compute(){
   const pos = POSITIONS[state.position] || null;
@@ -568,17 +621,27 @@ function compute(){
       ["숙박비", disc ? "할인정액 (상한액×85%)" : "실비 상한액", disc ? cents(T.lodge[g]*0.85) : T.lodge[g], nights, "박", disc ? T.lodge[g] : null],
     ];
     rows.push(`<tr class="leg-row"><td colspan="3"><strong>${esc(l.place.name)}</strong>${l.place.kind==="city"&&l.place.country!==l.place.name?esc(l.place.country)+" · ":""}${l.place.grade}등급 · ${short(l.start)}–${short(l.end)} · ${nights}박 ${days}일</td></tr>`);
-    items.forEach(([name,sub,unit,cnt,u,cap],k)=>{
+    l.ovr = l.ovr || [null,null,null];
+    items.forEach(([name,sub,unit,base,u,cap],k)=>{
+      // 예산 사정으로 일수·박수를 줄여 받는 경우: 사용자가 고친 값(기본값 이하)을 적용
+      if (l.ovr[k] != null && l.ovr[k] >= base) l.ovr[k] = null;
+      const cnt = l.ovr[k] ?? base, key = `${i}-${k}`;
       const sUsd = cents(unit*cnt); const krw = rate ? Math.floor(sUsd*rate) : 0;
       sums[k]+=krw; totUsd+=sUsd;
-      rows.push(`<tr><td class="item">${name}${sub?`<small>${sub}</small>`:""}</td><td class="calc">${cap?`${usd(cap)} × 85% = ${usd(unit)}<br>`:""}${usd(unit)} × ${cnt}${u} = <em>${usd(sUsd)}</em><br>${usd(sUsd)} × ${rate?rateFmt(rate):"—"}원 = <em>${rate?won(sUsd*rate):"—"}원</em></td><td class="r won">${rate?won(krw)+"원":"—"}</td></tr>`);
+      const cntHtml = state.editing === key
+        ? `<input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="${k}" aria-label="${name} ${u} 수">${u}`
+        : `<button type="button" class="cnt-btn" data-i="${i}" data-k="${k}" title="${name} ${u === "박" ? "박" : "일"} 수 수정">${cnt}${u}${PENCIL}</button>`;
+      const adj = l.ovr[k] != null ? `<span class="adj">기본 ${base}${u} → ${cnt}${u} 조정 <button type="button" class="cnt-reset" data-i="${i}" data-k="${k}">되돌리기</button></span>` : "";
+      rows.push(`<tr><td class="item">${name}${sub?`<small>${sub}</small>`:""}</td><td class="calc">${cap?`${usd(cap)} × 85% = ${usd(unit)}<br>`:""}${usd(unit)} × ${cntHtml} = <em>${usd(sUsd)}</em><br>${usd(sUsd)} × ${rate?rateFmt(rate):"—"}원 = <em>${rate?won(sUsd*rate):"—"}원</em>${adj}</td><td class="r won">${rate?won(krw)+"원":"—"}</td></tr>`);
     });
   });
   const total = sums[0]+sums[1]+sums[2];
   if (rows.length) rows.push(`<tr class="tot"><td>합계</td><td class="calc">${usd(totUsd)} · 총 ${totNights}박 ${totDays}일</td><td class="r won">${won(total)}원</td></tr>`);
   const need = [!T&&"직위", !legs.some(l=>l.place)&&"방문지", !legs.some(l=>l.start&&l.end)&&"출발일·도착일"].filter(Boolean);
   $("tbody").innerHTML = rows.join("");
-  $("tableWrap").hidden = !rows.length; $("emptyMsg").hidden = !!rows.length;
+  const editIn = $("tbody").querySelector(".cnt-in"); if (editIn){ editIn.focus(); editIn.select(); }
+  $("tableWrap").hidden = !rows.length; $("emptyMsg").hidden = !!rows.length; $("editHint").hidden = !rows.length;
+  $("mTotal").textContent = won(total)+"원";
   $("emptyMsg").textContent = `${need.length?need.join(", ")+"을(를) 선택하면":"일정을 입력하면"} 여기에 일비·식비·숙박비가 계산됩니다.`;
   $("tKrw").innerHTML = `${won(total)}<small>원</small>`;
   $("tUsd").textContent = `${usd(totUsd)} × ${rate?rateFmt(rate):"—"}`;
@@ -625,6 +688,29 @@ $("rate").addEventListener("input", e=>{
 });
 $("rate").addEventListener("blur", compute);
 $("rateReset").addEventListener("click", ()=>{ state.rateManual=null; compute(); });
+// 일수·박수 직접 수정 (예산 부족 시)
+function commitCnt(el){
+  const l = state.legs[+el.dataset.i]; if(!l) return;
+  const k = +el.dataset.k, max = +el.max, v = parseInt(el.value,10);
+  l.ovr = l.ovr || [null,null,null];
+  l.ovr[k] = Number.isFinite(v) && v >= 0 && v < max ? v : null;
+  state.editing = null; compute();
+}
+$("tbody").addEventListener("click", e=>{
+  const b = e.target.closest(".cnt-btn, .cnt-reset"); if(!b) return;
+  if (b.classList.contains("cnt-reset")){ const l=state.legs[+b.dataset.i]; if(l&&l.ovr) l.ovr[+b.dataset.k]=null; state.editing=null; }
+  else state.editing = `${b.dataset.i}-${b.dataset.k}`;
+  compute();
+});
+$("tbody").addEventListener("keydown", e=>{
+  if (!e.target.classList.contains("cnt-in")) return;
+  if (e.key==="Enter"){ e.preventDefault(); commitCnt(e.target); }
+  else if (e.key==="Escape"){ state.editing=null; compute(); }
+});
+$("tbody").addEventListener("focusout", e=>{ if (e.target.classList.contains("cnt-in") && state.editing) commitCnt(e.target); });
+// 모바일: 결과 카드가 보이면 하단 합계 바 숨김
+function syncBar(){ const r=$("result").getBoundingClientRect(); $("mbar").classList.toggle("off", r.top < innerHeight*0.75 && r.bottom > innerHeight*0.25); }
+addEventListener("scroll", syncBar, {passive:true}); addEventListener("resize", syncBar); syncBar();
 $("lodgeMode").addEventListener("click", e=>{ const b=e.target.closest("[data-lm]"); if(!b) return; state.lodgeMode=b.dataset.lm; compute();
   const w=b.closest(".tip-wrap"); if(w){ w.classList.add("show"); clearTimeout(w._t); w._t=setTimeout(()=>w.classList.remove("show"),4000); } });
 // GitHub Actions가 매일 갱신하는 rates.json을 읽어 내장 자료에 합칩니다.
@@ -715,3 +801,5 @@ renderLegs(); compute(); loadRatesFile(); fetchLive();
   draw();
 })();
 </script>
+</body>
+</html>
