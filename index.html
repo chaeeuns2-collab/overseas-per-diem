@@ -207,6 +207,7 @@ tr.tot td.won{font-size:16px}
 .cnt-btn::before{content:"";position:absolute;left:50%;bottom:calc(100% + 2px);margin-left:-5px;border:5px solid transparent;border-top-color:var(--ink);opacity:0;visibility:hidden;transition:opacity .12s,visibility .12s;z-index:5}
 .cnt-btn:hover::after,.cnt-btn:focus-visible::after{opacity:1;visibility:visible;transform:translate(-50%,0)}
 .cnt-btn:hover::before,.cnt-btn:focus-visible::before{opacity:1;visibility:visible}
+.cnt-edit{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
 .cnt-in{width:64px;height:28px;padding:0 8px;margin:0 2px;border:1.5px solid var(--moss);border-radius:8px;background:var(--paper);font:inherit;font-size:14px;color:var(--ink)}
 .adj{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px;font-size:11.5px;color:var(--warn)}
 .cnt-reset{border:0;background:none;padding:0;font:inherit;color:var(--ink-3);text-decoration:underline;cursor:pointer}
@@ -285,7 +286,10 @@ body{margin:0}
 .cnt-btn::before{content:"";position:absolute;inset:-7px -4px;border:0;margin:0;opacity:0;visibility:visible;background:none}
 .cnt-btn:hover::before,.cnt-btn:focus-visible::before{opacity:0}
 .cnt-reset{display:inline-flex;align-items:center;min-height:44px;margin-block:-14px;padding-inline:4px}
-.cnt-in{height:44px;margin-block:-8px}
+/* 일수 입력칸: 줄 안에 들어가는 크기로, 아래 계산식과 겹치지 않게 (음수 여백 없음) */
+.cnt-in{height:34px;width:56px;margin:0 2px;padding:0 6px;text-align:center;vertical-align:middle}
+.cnt-edit{gap:6px;flex-wrap:nowrap;white-space:nowrap;padding:4px 8px;margin-block:2px;border-radius:10px;background:var(--paper-2);border:1px solid var(--line);vertical-align:middle}
+.cnt-edit .cnt-in{margin:0}
 
 /* 5) 경고 상자 링크 색을 팔레트에 맞춤 */
 .note a{color:var(--lime-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--lime)}
@@ -330,26 +334,35 @@ body{margin:0}
   .applied,.nights,.lodge{padding:clamp(12px,.9vw,16px) clamp(14px,1.05vw,20px)}
   .checks span::before{width:clamp(18px,1.05vw,20px);height:clamp(18px,1.05vw,20px)}
 
+  /* 숙박비 계산 방식: 01 안에서 한 줄로 */
+  .lodge{flex-direction:row;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px 16px}
+  /* 03 적용 환율: 왼쪽 칸 맨 아래로 붙여 결과 카드 끝과 나란히 */
+  .left > .group:nth-child(3){margin-top:auto}
+  .lodge .tip::after{left:auto;right:84px}
+  /* 결과 카드가 스크롤을 따라와서, 왼쪽을 03까지 내려도 합계·기준율이 옆에 보임 */
+  .right{overflow:clip}
+  .stage{position:sticky;top:0}
+
   /* 오른쪽 결과: 왼쪽과 같은 비율로 키움 */
   .stage{padding:clamp(36px,4.2vw,84px) clamp(24px,3vw,64px)}
-  .card{max-width:clamp(760px,49vw,960px);padding:clamp(40px,2.6vw,52px) clamp(28px,2vw,40px) clamp(24px,1.7vw,34px);border-radius:clamp(26px,1.6vw,30px)}
+  .card{max-width:clamp(720px,43vw,860px);padding:clamp(38px,2.3vw,46px) clamp(26px,1.8vw,34px) clamp(22px,1.5vw,30px);border-radius:clamp(26px,1.6vw,30px)}
   .float{padding:clamp(16px,1.05vw,20px) clamp(20px,1.3vw,26px);margin-bottom:clamp(-30px,-1.5vw,-26px)}
   .float .k{font-size:clamp(12px,.68vw,13px)}
-  .float .v{font-size:clamp(20px,1.35vw,26px)}
+  .float .v{font-size:clamp(20px,1.2vw,23px)}
   .float .s{font-size:clamp(14px,.78vw,15px)}
-  .sum h2{font-size:clamp(15px,.95vw,18px)}
+  .sum h2{font-size:clamp(15px,.85vw,16.5px)}
   .sum p,.total .usd{font-size:clamp(14px,.78vw,15px)}
-  .total .big{font-size:clamp(32px,2.4vw,46px)}
+  .total .big{font-size:clamp(30px,2.1vw,40px)}
   .tiles{gap:clamp(10px,.75vw,14px);margin-top:clamp(18px,1.2vw,24px)}
-  .tile{padding:clamp(12px,.85vw,16px) clamp(14px,1vw,18px);border-radius:clamp(16px,1vw,18px)}
+  .tile{padding:clamp(12px,.75vw,14px) clamp(14px,.9vw,16px);border-radius:clamp(16px,1vw,18px)}
   .tile .t{font-size:clamp(14px,.78vw,15px)}
-  .tile .n{font-size:clamp(17px,1.15vw,22px)}
-  .edit-hint,.empty-state,.foot{font-size:clamp(14px,.8vw,15.5px)}
-  #tableWrap table{font-size:clamp(14px,.85vw,16px)}
-  #tableWrap .calc,#tableWrap tr.leg-row td,#tableWrap td.item small{font-size:clamp(14px,.8vw,15.5px)}
+  .tile .n{font-size:clamp(17px,1vw,19px)}
+  .edit-hint,.empty-state,.foot{font-size:clamp(14px,.75vw,14.5px)}
+  #tableWrap table{font-size:clamp(14px,.78vw,15px)}
+  #tableWrap .calc,#tableWrap tr.leg-row td,#tableWrap td.item small{font-size:clamp(14px,.75vw,14.5px)}
   #tableWrap th{font-size:clamp(12px,.68vw,13px)}
   #tableWrap td{padding:clamp(11px,.75vw,14px) clamp(8px,.55vw,10px)}
-  #tableWrap tr.tot td.won{font-size:clamp(16px,1vw,19px)}
+  #tableWrap tr.tot td.won{font-size:clamp(16px,.9vw,17.5px)}
 }
 </style>
 </head>
@@ -394,14 +407,6 @@ body{margin:0}
         </select>
       </label>
       <div class="applied"><span class="chip" id="tierChip">선택 전</span><span id="tierWhy"></span></div>
-    </div>
-
-    <div class="group">
-      <h2 class="label"><b>02</b>국외 출장 일정</h2>
-      <p class="hint">도시나 국가를 검색해 선택하세요. 여러 도시를 방문하면 구간을 추가합니다.</p>
-      <div class="legs" id="legs"></div>
-      <button class="add" type="button" id="addLeg">＋ 방문 도시 추가</button>
-      <div class="trip" id="trip"></div>
       <div class="lodge">
         <span class="lodge-t">숙박비 계산 방식</span>
         <div class="seg" role="group" aria-label="숙박비 계산 방식" id="lodgeMode">
@@ -412,6 +417,14 @@ body{margin:0}
           </span>
         </div>
       </div>
+    </div>
+
+    <div class="group">
+      <h2 class="label"><b>02</b>국외 출장 일정</h2>
+      <p class="hint">도시나 국가를 검색해 선택하세요. 여러 도시를 방문하면 구간을 추가합니다.</p>
+      <div class="legs" id="legs"></div>
+      <button class="add" type="button" id="addLeg">＋ 방문 도시 추가</button>
+      <div class="trip" id="trip"></div>
     </div>
 
     <div class="group">
@@ -446,7 +459,7 @@ body{margin:0}
           <div class="tile"><div class="t">식비</div><div class="n" id="s2">0원</div></div>
           <div class="tile"><div class="t" id="s3t">숙박비 (상한)</div><div class="n" id="s3">0원</div></div>
         </div>
-        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수(예: 15일)를 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.</p>
+        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수(예: 15일)를 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.<br>식비는 일수를 누르면 기내식으로 받은 끼니 수도 넣을 수 있습니다. 기내식 1식은 하루 식비의 1/3로 계산해 뺍니다. (예: 2식 → 2/3일 차감)</p>
         <p class="empty-state" id="emptyMsg" hidden></p>
         <div class="table-wrap" id="tableWrap">
           <table>
@@ -568,7 +581,9 @@ const state = {
 
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
-const won = n => Math.floor(n).toLocaleString("ko-KR");
+// 원 미만 절사. 달러×환율의 소수점 오차(예: 3,582,494.9999…)로 1원이 빠지지 않게 아주 작은 값을 더한 뒤 버림
+const floorWon = n => Math.floor(n + 1e-6);
+const won = n => floorWon(n).toLocaleString("ko-KR");
 const usd = n => "US$" + n.toLocaleString("en-US",{maximumFractionDigits:2});
 const cents = n => Math.round(n*100)/100;
 const rateFmt = r => r.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -725,17 +740,26 @@ function compute(){
       ["숙박비", disc ? "할인정액 (상한액×85%)" : "실비 상한액", disc ? cents(T.lodge[g]*0.85) : T.lodge[g], nights, "박", disc ? T.lodge[g] : null],
     ];
     rows.push(`<tr class="leg-row"><td colspan="3"><strong>${esc(l.place.name)}</strong>${l.place.kind==="city"&&l.place.country!==l.place.name?esc(l.place.country)+" · ":""}${l.place.grade}등급 · ${short(l.start)}–${short(l.end)} · ${nights}박 ${days}일</td></tr>`);
-    l.ovr = l.ovr || [null,null,null];
+    l.ovr = l.ovr || [null,null,null,null];
     items.forEach(([name,sub,unit,base,u,cap],k)=>{
       // 예산 사정으로 일수·박수를 줄여 받는 경우: 사용자가 고친 값(기본값 이하)을 적용
       if (l.ovr[k] != null && l.ovr[k] >= base) l.ovr[k] = null;
       const cnt = l.ovr[k] ?? base, key = `${i}-${k}`;
-      const sUsd = cents(unit*cnt); const krw = rate ? Math.floor(sUsd*rate) : 0;
+      // 식비: 기내식으로 받은 끼니는 하루 3식 기준으로 뺌 (1식 = 하루 식비의 1/3)
+      const meals = k === 1 ? Math.min(l.ovr[3] || 0, cnt*3) : 0;
+      const sUsd = cents(unit*cnt - unit*meals/3); const krw = rate ? floorWon(sUsd*rate) : 0;
       sums[k]+=krw; totUsd+=sUsd;
+      const tip = k === 1 ? "일수·기내식 수정" : u === "박" ? "박수 수정" : "일수 수정";
+      const label = meals ? `${cnt}${u} − ${meals}식` : `${cnt}${u}`;
       const cntHtml = state.editing === key
-        ? `<input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="${k}" aria-label="${name} ${u} 수">${u}`
-        : `<button type="button" class="cnt-btn" data-i="${i}" data-k="${k}" data-tip="${u === "박" ? "박수 수정" : "일수 수정"}" aria-label="${name} ${cnt}${u}, ${u === "박" ? "박수 수정" : "일수 수정"}">${cnt}${u}</button>`;
-      const adj = l.ovr[k] != null ? `<span class="adj">기본 ${base}${u} → ${cnt}${u} 조정 <button type="button" class="cnt-reset" data-i="${i}" data-k="${k}">되돌리기</button></span>` : "";
+        ? (k === 1
+          ? `<span class="cnt-edit"><input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="1" data-f="days" aria-label="식비 일수">일 − 기내식 <input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base*3}" value="${meals}" data-i="${i}" data-k="1" data-f="meals" aria-label="기내식으로 받은 끼니 수">식</span>`
+          : `<input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="${k}" aria-label="${name} ${u} 수">${u}`)
+        : `<button type="button" class="cnt-btn" data-i="${i}" data-k="${k}" data-tip="${tip}" aria-label="${name} ${label}, ${tip}">${label}</button>`;
+      const notes = [];
+      if (l.ovr[k] != null) notes.push(`기본 ${base}${u} → ${cnt}${u}`);
+      if (meals) notes.push(`기내식 ${meals}식 제외(${meals}/3일)`);
+      const adj = notes.length ? `<span class="adj">${notes.join(" · ")} <button type="button" class="cnt-reset" data-i="${i}" data-k="${k}">되돌리기</button></span>` : "";
       rows.push(`<tr><td class="item">${name}${sub?`<small>${sub}</small>`:""}</td><td class="calc">${cap?`${usd(cap)} × 85% = ${usd(unit)}<br>`:""}${usd(unit)} × ${cntHtml} = <em>${usd(sUsd)}</em><br>${usd(sUsd)} × ${rate?rateFmt(rate):"—"}원 = <em>${rate?won(sUsd*rate):"—"}원</em>${adj}</td><td class="r won">${rate?won(krw)+"원":"—"}</td></tr>`);
     });
   });
@@ -795,14 +819,20 @@ $("rateReset").addEventListener("click", ()=>{ state.rateManual=null; compute();
 // 일수·박수 직접 수정 (예산 부족 시)
 function commitCnt(el){
   const l = state.legs[+el.dataset.i]; if(!l) return;
-  const k = +el.dataset.k, max = +el.max, v = parseInt(el.value,10);
-  l.ovr = l.ovr || [null,null,null];
+  l.ovr = l.ovr || [null,null,null,null];
+  const wrap = el.closest(".cnt-edit");
+  const dIn = wrap ? wrap.querySelector('[data-f="days"]') : el;
+  const k = +dIn.dataset.k, max = +dIn.max, v = parseInt(dIn.value,10);
   l.ovr[k] = Number.isFinite(v) && v >= 0 && v < max ? v : null;
+  if (wrap){
+    const mIn = wrap.querySelector('[data-f="meals"]'), m = parseInt(mIn.value,10);
+    l.ovr[3] = Number.isFinite(m) && m > 0 ? m : null;   // 일수×3을 넘으면 계산할 때 일수×3으로 맞춤
+  }
   state.editing = null; compute();
 }
 $("tbody").addEventListener("click", e=>{
   const b = e.target.closest(".cnt-btn, .cnt-reset"); if(!b) return;
-  if (b.classList.contains("cnt-reset")){ const l=state.legs[+b.dataset.i]; if(l&&l.ovr) l.ovr[+b.dataset.k]=null; state.editing=null; }
+  if (b.classList.contains("cnt-reset")){ const l=state.legs[+b.dataset.i]; if(l&&l.ovr){ l.ovr[+b.dataset.k]=null; if(+b.dataset.k===1) l.ovr[3]=null; } state.editing=null; }
   else state.editing = `${b.dataset.i}-${b.dataset.k}`;
   compute();
 });
@@ -811,7 +841,12 @@ $("tbody").addEventListener("keydown", e=>{
   if (e.key==="Enter"){ e.preventDefault(); commitCnt(e.target); }
   else if (e.key==="Escape"){ state.editing=null; compute(); }
 });
-$("tbody").addEventListener("focusout", e=>{ if (e.target.classList.contains("cnt-in") && state.editing) commitCnt(e.target); });
+$("tbody").addEventListener("focusout", e=>{
+  if (!e.target.classList.contains("cnt-in") || !state.editing) return;
+  const wrap = e.target.closest(".cnt-edit");
+  if (wrap && wrap.contains(e.relatedTarget)) return;   // 일수 칸 → 기내식 칸으로 옮길 때는 아직 적용하지 않음
+  commitCnt(e.target);
+});
 // 모바일: 결과 카드가 보이면 하단 합계 바 숨김
 function syncBar(){ const r=$("result").getBoundingClientRect(); $("mbar").classList.toggle("off", r.top < innerHeight*0.75 && r.bottom > innerHeight*0.25); }
 addEventListener("scroll", syncBar, {passive:true}); addEventListener("resize", syncBar); syncBar();
