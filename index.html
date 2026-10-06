@@ -11,7 +11,7 @@
 <style>
 @font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;src:url("fonts/PretendardVariable.woff2") format("woff2-variations"),url("fonts/PretendardVariable.woff2") format("woff2")}
 :root{
-  --paper:#F9F7F4; --paper-2:#F3EFEA; --ink:#1F2A38; --ink-2:#4A5361; --ink-3:#7E8693;
+  --paper:#F9F7F4; --paper-2:#F3EFEA; --ink:#1F2A38; --ink-2:#4A5361; --ink-3:#646B78;
   --line:#E6E1DA; --line-2:#D8D1C8; --field:#F0ECE7; --lime:#F4C8A2; --lime-ink:#5A3216;
   --moss:#6E6FC0; --glass:rgba(255,253,250,.86); --glass-line:rgba(255,255,255,.9);
   --chip-ga:#F6E6C9; --chip-ga-ink:#7A4E0E; --chip-na:#E3EED3; --chip-na-ink:#3D5A1F;
@@ -260,6 +260,97 @@ tr.tot td.won{font-size:16px}
 }
 html{-webkit-text-size-adjust:100%}
 body{margin:0}
+
+/* ---------- 접근성 보정 (CSS만, 2026-10-06) ---------- */
+/* 1) 대비 4.5:1 이상 */
+::placeholder{color:var(--ink-3);opacity:1}
+.seg button small{opacity:1}
+.info{opacity:1}
+
+/* 2) 본문 글씨 최소 14px (칩·표 머리글·작은 배지 라벨은 12px) */
+.top-bar,.applied,.nights-q,.seg button,.field>span,.hint,.leg-head,.x,.opt.empty,.opt small,
+.leg-meta,.add,.lodge-t,.tip,.trip,.ghost,.note,.checks,.float .s,.sum p,.total .usd,
+.tile .t,table,tr.leg-row td,td.item small,.calc,.foot,.fine,.ref table,.adj,.edit-hint,
+.copy,.mfoot,.mbtn,.cnt-btn::after{font-size:14px}
+.chip,th,.float .k,.live,.seg button small,.mbar small{font-size:12px}
+
+/* 4) 터치 영역 최소 44px (보이는 모양은 유지) */
+.seg button{min-height:44px;height:auto}
+.add,.mbtn{min-height:44px;height:auto}
+.x{min-height:44px;margin-block:-10px;padding-inline:12px}
+.opt{min-height:44px}
+.top-bar a,.mfoot a,.note a{display:inline-flex;align-items:center;min-height:44px;margin-block:-10px}
+.mfoot a{margin-block:0}
+.cnt-btn{min-height:30px;vertical-align:middle}
+.cnt-btn::before{content:"";position:absolute;inset:-7px -4px;border:0;margin:0;opacity:0;visibility:visible;background:none}
+.cnt-btn:hover::before,.cnt-btn:focus-visible::before{opacity:0}
+.cnt-reset{display:inline-flex;align-items:center;min-height:44px;margin-block:-14px;padding-inline:4px}
+.cnt-in{height:44px;margin-block:-8px}
+
+/* 5) 경고 상자 링크 색을 팔레트에 맞춤 */
+.note a{color:var(--lime-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--lime)}
+.note a:hover{color:var(--ink);text-decoration-color:currentColor}
+
+/* 3) 모바일 지급표: 가로로 잘리지 않게 행을 카드로 쌓음 */
+@media (max-width:760px){
+  .ref{padding-inline:16px}
+  .ref .table-wrap{overflow:visible}
+  .ref table{min-width:0}
+  .ref thead{display:none}
+  .ref tr{display:block;padding:12px 14px;margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+  .ref tr.on{background:var(--paper-2);border-color:var(--line-2)}
+  .ref tr.on td{background:none}
+  .ref td{display:flex;justify-content:space-between;gap:12px;padding:4px 0;border:0;text-align:right}
+  .ref td:first-child{font-weight:600;padding-bottom:6px;text-align:left}
+  .ref td:nth-child(n+2)::before{color:var(--ink-2);text-align:left;font-weight:400}
+  .ref td:nth-child(2)::before{content:"일비"}
+  .ref td:nth-child(3)::before{content:"숙박비 상한 (가/나/다/라)"}
+  .ref td:nth-child(4)::before{content:"식비 (가/나/다/라)"}
+}
+/* ---------- PC: 입력 영역이 왼쪽 칸을 채우고, 글씨·입력칸이 화면 폭에 맞춰 커짐 ---------- */
+@media (min-width:1001px){
+  .left{max-width:820px;justify-self:center;padding:clamp(32px,3vw,60px) clamp(32px,3.4vw,68px);gap:clamp(28px,2.2vw,42px)}
+  .group{gap:clamp(14px,1.05vw,20px)}
+  .group+.group{padding-top:clamp(28px,2.2vw,42px)}
+  .label{font-size:clamp(20px,1.35vw,25px);gap:clamp(12px,.75vw,14px)}
+  .label b{width:clamp(34px,2vw,38px);height:clamp(34px,2vw,38px);font-size:clamp(13px,.78vw,15px)}
+  .row2{gap:clamp(12px,1vw,18px)}
+  .field{gap:clamp(6px,.45vw,9px)}
+  .field>span,.hint,.applied,.nights-q,.leg-head,.leg-meta,.lodge-t,.trip,.note,.checks,
+  .seg button,.add,.ghost,.x,.opt,.opt.empty{font-size:clamp(14px,.82vw,15.5px)}
+  .input,.select{height:clamp(46px,2.7vw,52px);font-size:clamp(15px,.88vw,16.5px);padding-inline:clamp(18px,1.2vw,22px)}
+  .select{padding-right:44px;background-position:calc(100% - 22px) calc(50% - 2px),calc(100% - 17px) calc(50% - 2px)}
+  .combo .input{padding-left:clamp(42px,2.6vw,48px)}
+  .combo svg{top:50%;transform:translateY(-50%)}
+  .combo .picked{top:50%;transform:translateY(-50%)}
+  .list{top:calc(100% + 6px)}
+  .ghost{height:clamp(46px,2.7vw,52px)}
+  .seg button{min-height:clamp(44px,2.55vw,48px);padding-inline:clamp(14px,1vw,18px)}
+  .leg{padding:clamp(16px,1.25vw,24px);gap:clamp(12px,.9vw,16px);border-radius:clamp(22px,1.5vw,26px)}
+  .applied,.nights,.lodge{padding:clamp(12px,.9vw,16px) clamp(14px,1.05vw,20px)}
+  .checks span::before{width:clamp(18px,1.05vw,20px);height:clamp(18px,1.05vw,20px)}
+
+  /* 오른쪽 결과: 왼쪽과 같은 비율로 키움 */
+  .stage{padding:clamp(36px,4.2vw,84px) clamp(24px,3vw,64px)}
+  .card{max-width:clamp(760px,49vw,960px);padding:clamp(40px,2.6vw,52px) clamp(28px,2vw,40px) clamp(24px,1.7vw,34px);border-radius:clamp(26px,1.6vw,30px)}
+  .float{padding:clamp(16px,1.05vw,20px) clamp(20px,1.3vw,26px);margin-bottom:clamp(-30px,-1.5vw,-26px)}
+  .float .k{font-size:clamp(12px,.68vw,13px)}
+  .float .v{font-size:clamp(20px,1.35vw,26px)}
+  .float .s{font-size:clamp(14px,.78vw,15px)}
+  .sum h2{font-size:clamp(15px,.95vw,18px)}
+  .sum p,.total .usd{font-size:clamp(14px,.78vw,15px)}
+  .total .big{font-size:clamp(32px,2.4vw,46px)}
+  .tiles{gap:clamp(10px,.75vw,14px);margin-top:clamp(18px,1.2vw,24px)}
+  .tile{padding:clamp(12px,.85vw,16px) clamp(14px,1vw,18px);border-radius:clamp(16px,1vw,18px)}
+  .tile .t{font-size:clamp(14px,.78vw,15px)}
+  .tile .n{font-size:clamp(17px,1.15vw,22px)}
+  .edit-hint,.empty-state,.foot{font-size:clamp(14px,.8vw,15.5px)}
+  #tableWrap table{font-size:clamp(14px,.85vw,16px)}
+  #tableWrap .calc,#tableWrap tr.leg-row td,#tableWrap td.item small{font-size:clamp(14px,.8vw,15.5px)}
+  #tableWrap th{font-size:clamp(12px,.68vw,13px)}
+  #tableWrap td{padding:clamp(11px,.75vw,14px) clamp(8px,.55vw,10px)}
+  #tableWrap tr.tot td.won{font-size:clamp(16px,1vw,19px)}
+}
 </style>
 </head>
 <body>
