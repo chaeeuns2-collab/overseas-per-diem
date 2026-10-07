@@ -483,7 +483,7 @@ body{margin:0}
           <div class="tile"><div class="t">식비</div><div class="n" id="s2">0원</div></div>
           <div class="tile"><div class="t" id="s3t">숙박비 (상한)</div><div class="n" id="s3">0원</div></div>
         </div>
-        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수(예: 15일)를 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.<br>식비는 일수를 누르면 기내식으로 받은 끼니 수도 넣을 수 있습니다. 기내식 1식은 하루 식비의 1/3로 계산해 뺍니다. (예: 2식 → 2/3일 차감)</p>
+        <p class="edit-hint" id="editHint" hidden>예산 사정으로 덜 받는 경우 표의 일수(예: 15일)를 눌러 일비·식비·숙박비 일수를 각각 줄일 수 있습니다.<br>기내에서 제공받은 식사를 반영하여 식비를 조정할 수 있습니다. 본 계산기는 편의상 1식당 1/3을 차감합니다.<br>일비는 일수를 누르면 공무용·임차차량을 사용한 날 수를 넣을 수 있으며, 그날 일비는 1/2로 계산합니다.</p>
         <p class="empty-state" id="emptyMsg" hidden></p>
         <div class="table-wrap" id="tableWrap">
           <table>
@@ -738,12 +738,18 @@ function lookupRate(dateStr){
   return {rate:tbl[key], key, exact: key===k, after: k > ks[ks.length-1]};
 }
 
-// 동일지역 장기체재 일비 감액 (영 제17조, 업무지침 Ⅴ.5.나 → Ⅳ: 도착일·출발일과 도착 다음 날부터 15일까지 정액,
-// 16~30일째 10분의 1, 31~60일째 10분의 2, 61일째부터 10분의 3 감액). 반환: 날짜별 지급비율(앞에서부터 cnt일)
-function dailyFactors(span, shared, cnt){
-  const f = [];
-  for (let d = shared ? 1 : 0; d <= span; d++) f.push(d === 0 || d === span || d <= 15 ? 1 : d <= 30 ? 0.9 : d <= 60 ? 0.8 : 0.7);
-  return f.slice(0, cnt);
+// 동일지역 장기체재 일비 감액 (영 제17조, 업무지침 Ⅴ.5.나 → Ⅳ.5.다): 도착일·출발일과 도착 다음 날부터 15일까지 정액,
+// 16~30일째 10분의 1, 31~60일째 10분의 2, 61일째부터 10분의 3 감액.
+// 장기체재 중 일시 다른 지역에 출장한 기간은 빼고 체재기간을 계산한다(Ⅳ.5.다.3)다)) → 같은 도시로 돌아오면
+// 앞선 체재일수 n0에 이어서 센다. 반환: { f: 날짜별 지급비율(앞에서부터 cnt일), n: 이 방문까지 누적 체재일수 }
+function dailyFactors(span, shared, cnt, n0 = 0){
+  const f = []; let n = n0;
+  for (let d = shared ? 1 : 0; d <= span; d++){
+    if (span > 0 && d === span){ f.push(1); continue; }     // 출발일(다른 곳으로 떠나는 날) 정액
+    if (d === 0 && n0 === 0){ f.push(1); continue; }        // 처음 도착한 날 정액
+    n++; f.push(n <= 15 ? 1 : n <= 30 ? 0.9 : n <= 60 ? 0.8 : 0.7);
+  }
+  return { f: f.slice(0, cnt), n };
 }
 
 /* ---------- legs UI ---------- */
@@ -858,6 +864,7 @@ function compute(){
   const legs = state.legs;
   const valid = legs.map(l=>l.place && l.start && l.end && dayDiff(l.start,l.end)>=0);
   let prevEnd = null;
+  const stay = {};   // 도시별 누적 체재일수 (장기체재 감액용)
   const rows = []; const usdBy=[0,0,0]; let fixedUsd=0, capUsd=0, totNights=0, totDays=0; const fxList = [];
   const disc = state.lodgeMode === "disc";
   legs.forEach((l,i)=>{
@@ -889,37 +896,46 @@ function compute(){
       ["숙박비", disc ? "할인정액 (상한액×85%)" : "실비 상한액 (정산 한도)", T.lodge[g], nights, "박"],
     ];
     rows.push(`<tr class="leg-row"><td colspan="3"><strong>${esc(l.place.name)}</strong>${l.place.kind==="city"&&l.place.country!==l.place.name?esc(l.place.country)+" · ":""}${l.place.grade}등급 · ${short(l.start)}–${short(l.end)} · ${nights}박 ${days}일</td></tr>`);
-    l.ovr = l.ovr || [null,null,null,null];
+    l.ovr = l.ovr || [null,null,null,null,null];
     items.forEach(([name,sub,unit,base,u],k)=>{
       // 예산 사정으로 일수·박수를 줄여 받는 경우: 사용자가 고친 값(기본값 이하)을 적용
       if (l.ovr[k] != null && l.ovr[k] >= base) l.ovr[k] = null;
       const cnt = l.ovr[k] ?? base, key = `${i}-${k}`;
       const meals = k === 1 ? Math.min(l.ovr[3] || 0, cnt*3) : 0;     // 식비: 기내식 1식 = 하루 식비의 1/3
+      const cars = k === 0 ? Math.min(l.ovr[4] || 0, cnt) : 0;        // 일비: 공무용·임차차량 사용일 수
       let sUsd, formula, extra = "";
       if (k === 0){
-        const f = dailyFactors(span, shared, cnt), units = f.reduce((a,b)=>a+b,0);
+        const sk = l.place.name, n0 = stay[sk] || 0;
+        const { f, n } = dailyFactors(span, shared, cnt, n0); stay[sk] = n;
+        const base1 = f.reduce((a,b)=>a+b,0);
+        // 공무용·임차차량 사용일: 그날 일비의 1/2 (사용 날짜를 모르므로 이 방문지 하루 평균 일비 기준)
+        const units = cents(base1 - (cnt ? 0.5 * cars * base1 / cnt : 0));
         sUsd = cents(unit*units);
-        if (units >= cnt - 1e-9 && span - (shared ? 1 : 0) >= 16) extra = "없음 (도착일·출발일을 뺀 체재일이 15일 이하)";
-        if (units < cnt - 1e-9){
+        const cont = n0 > 0 ? `앞선 ${esc(sk)} 체재 ${n0}일에 이어 계산 · ` : "";
+        if (base1 >= cnt - 1e-9 && n >= 15) extra = cont + "감액 없음 (도착일·출발일과 다른 지역 출장기간을 뺀 체재일이 15일 이하)";
+        else if (base1 < cnt - 1e-9){
           const c = r => f.filter(x=>x===r).length;
-          extra = [c(1)&&`정액 ${c(1)}일`, c(0.9)&&`90% ${c(0.9)}일`, c(0.8)&&`80% ${c(0.8)}일`, c(0.7)&&`70% ${c(0.7)}일`].filter(Boolean).join(" + ");
-          formula = ` → ${+units.toFixed(2)}일분`;
+          extra = cont + [c(1)&&`정액 ${c(1)}일`, c(0.9)&&`90% ${c(0.9)}일`, c(0.8)&&`80% ${c(0.8)}일`, c(0.7)&&`70% ${c(0.7)}일`].filter(Boolean).join(" + ");
         }
+        if (units < cnt - 1e-9) formula = ` → ${+units.toFixed(2)}일분`;
       } else if (k === 1) sUsd = cents(unit*cnt - unit*meals/3);
       else sUsd = disc ? Math.round(unit*cnt*0.85 + 1e-9) : unit*cnt;   // 할인정액: 소수점 이하 반올림
       usdBy[k] += sUsd;
       if (k === 2 && !disc){ capUsd += sUsd; if (cnt > 0) fxList.push({place:l.place, cap:unit, nights:cnt}); } else fixedUsd += sUsd;
       const krw = R ? floorWon(sUsd*R) : 0;
-      const tip = k === 1 ? "일수·기내식 수정" : u === "박" ? "박수 수정" : "일수 수정";
-      const label = meals ? `${cnt}${u} − ${meals}식` : `${cnt}${u}`;
+      const tip = k === 1 ? "일수·기내식 수정" : k === 0 ? "일수·차량 사용일 수정" : "박수 수정";
+      const label = meals ? `${cnt}${u} − ${meals}식` : cars ? `${cnt}${u} · 차량 ${cars}일` : `${cnt}${u}`;
       const cntHtml = state.editing === key
         ? (k === 1
-          ? `<span class="cnt-edit"><input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="1" data-f="days" aria-label="식비 일수">일 − 기내식 <input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base*3}" value="${meals}" data-i="${i}" data-k="1" data-f="meals" aria-label="기내식으로 받은 끼니 수">식</span>`
+          ? `<span class="cnt-edit"><input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="1" data-f="days" aria-label="식비 일수">일 − 기내식 <input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base*3}" value="${meals}" data-i="${i}" data-k="1" data-f="extra" data-x="3" aria-label="기내에서 제공받은 식사 수">식</span>`
+          : k === 0
+          ? `<span class="cnt-edit"><input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="0" data-f="days" aria-label="일비 일수">일 · 공용·임차차량 <input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cars}" data-i="${i}" data-k="0" data-f="extra" data-x="4" aria-label="공무용 또는 임차차량을 사용한 날 수">일</span>`
           : `<input class="cnt-in" type="number" inputmode="numeric" min="0" max="${base}" value="${cnt}" data-i="${i}" data-k="${k}" aria-label="${name} ${u} 수">${u}`)
         : `<button type="button" class="cnt-btn" data-i="${i}" data-k="${k}" data-tip="${tip}" aria-label="${name} ${label}, ${tip}">${label}</button>`;
       const notes = [];
       if (l.ovr[k] != null) notes.push(`기본 ${base}${u} → ${cnt}${u}`);
       if (meals) notes.push(`기내식 ${meals}식 제외(${meals}/3일)`);
+      if (cars) notes.push(`공용·임차차량 사용 ${cars}일 일비 1/2`);
       const adj = notes.length ? `<span class="adj">${notes.join(" · ")} <button type="button" class="cnt-reset" data-i="${i}" data-k="${k}">되돌리기</button></span>` : "";
       const longStay = extra ? `<span class="adj">장기체재 일비 감액: ${extra}</span>` : "";
       const line1 = k === 2 && disc
@@ -993,20 +1009,20 @@ $("rateReset").addEventListener("click", ()=>{ state.rateManual=null; compute();
 // 일수·박수 직접 수정 (예산 부족 시)
 function commitCnt(el){
   const l = state.legs[+el.dataset.i]; if(!l) return;
-  l.ovr = l.ovr || [null,null,null,null];
+  l.ovr = l.ovr || [null,null,null,null,null];
   const wrap = el.closest(".cnt-edit");
   const dIn = wrap ? wrap.querySelector('[data-f="days"]') : el;
   const k = +dIn.dataset.k, max = +dIn.max, v = parseInt(dIn.value,10);
   l.ovr[k] = Number.isFinite(v) && v >= 0 && v < max ? v : null;
   if (wrap){
-    const mIn = wrap.querySelector('[data-f="meals"]'), m = parseInt(mIn.value,10);
-    l.ovr[3] = Number.isFinite(m) && m > 0 ? m : null;   // 일수×3을 넘으면 계산할 때 일수×3으로 맞춤
+    const xIn = wrap.querySelector('[data-f="extra"]'), m = parseInt(xIn.value,10);
+    l.ovr[+xIn.dataset.x] = Number.isFinite(m) && m > 0 ? m : null;   // 상한(식비 일수×3, 일비 일수)은 계산할 때 맞춤
   }
   state.editing = null; compute();
 }
 $("tbody").addEventListener("click", e=>{
   const b = e.target.closest(".cnt-btn, .cnt-reset"); if(!b) return;
-  if (b.classList.contains("cnt-reset")){ const l=state.legs[+b.dataset.i]; if(l&&l.ovr){ l.ovr[+b.dataset.k]=null; if(+b.dataset.k===1) l.ovr[3]=null; } state.editing=null; }
+  if (b.classList.contains("cnt-reset")){ const l=state.legs[+b.dataset.i]; if(l&&l.ovr){ l.ovr[+b.dataset.k]=null; if(+b.dataset.k===1) l.ovr[3]=null; if(+b.dataset.k===0) l.ovr[4]=null; } state.editing=null; }
   else state.editing = `${b.dataset.i}-${b.dataset.k}`;
   compute();
 });
