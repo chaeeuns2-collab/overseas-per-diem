@@ -3,7 +3,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const { getUsdRate } = require("./api/_hana");
+const { getUsdRate, getFxTable } = require("./api/_hana");
 
 const PORT = process.env.PORT || 8080;
 const page = path.join(__dirname, "index.html");
@@ -21,9 +21,22 @@ http.createServer(async (req, res) => {
     }
     return;
   }
-  if (url.pathname === "/rates.json") {
+  if (url.pathname === "/api/fx") {
+    try {
+      const data = await getFxTable(url.searchParams.get("date"));
+      res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify(data));
+    } catch (e) {
+      res.writeHead(502, { "Content-Type": "application/json; charset=utf-8" });
+      res.end(JSON.stringify({ error: e.message }));
+    }
+    return;
+  }
+  if (url.pathname === "/rates.json" || url.pathname === "/cash.json" || /^\/fx\/\d{4}\.json$/.test(url.pathname)) {
+    const file = path.join(__dirname, url.pathname.slice(1));
+    if (!fs.existsSync(file)) { res.writeHead(404); res.end(); return; }
     res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-    fs.createReadStream(path.join(__dirname, "rates.json")).pipe(res);
+    fs.createReadStream(file).pipe(res);
     return;
   }
   if (url.pathname.startsWith("/files/") || url.pathname.startsWith("/fonts/")) {
